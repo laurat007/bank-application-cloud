@@ -12,7 +12,7 @@ services:
   #     - internal
 
   apigateway:
-    build: ./ApiGatewayMicroservice
+    image: lauracucu/api-gateway-microservice:1
     ports:
       - 2810:80
     environment:
@@ -35,7 +35,7 @@ services:
   #     - books
 
   auth-service:
-    build: ./AuthMicroservice
+    image: lauracucu/auth-microservice:
     environment:
       JWT_SECRET_KEY: myawesomeultrasecretkey
       JWT_ISSUER: student
@@ -53,7 +53,7 @@ services:
       - auth-db-network
 
   clients-service:
-    build: ./ClientsMicroservice
+    image: lauracucu/clients-microservice:1
     environment:
       IO_SERVICE_API_ROUTE: bank-app_io-service/api
       AUTH_SERVICE_API_ROUTE: bank-app_auth-service/api
@@ -79,7 +79,7 @@ services:
   #     - database
 
   io-service:
-    build: ./IOMicroservice
+    image: lauracucu/io-microservices:1
     environment:
       PGUSER: admin
       PGPASSWORD: admin
