@@ -35,7 +35,7 @@ services:
   #     - books
 
   auth-service:
-    image: lauracucu/auth-microservice:
+    image: lauracucu/auth-microservice:1
     environment:
       JWT_SECRET_KEY: myawesomeultrasecretkey
       JWT_ISSUER: student
