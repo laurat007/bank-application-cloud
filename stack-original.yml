@@ -1,19 +1,38 @@
 version: "3.8"
 
 services:
+  # gateway:
+  #   image: axonedge/lab4apigateway:latest
+  #   ports:
+  #     - 3000:80
+  #   environment:
+  #     BOOKS_SERVICE_API_ROUTE: lab4-cluster_books-service/api
+  #     NODE_ENV: development
+  #   networks:
+  #     - internal
+
   apigateway:
     image: lauracucu/api-gateway-microservice:1
     ports:
       - 2810:80
     environment:
-      CLIENTS_SERVICE_API_ROUTE: clients-service/api
-      AUTH_SERVICE_API_ROUTE: auth-service/api
+      CLIENTS_SERVICE_API_ROUTE: bank-app_clients-service/api
+      AUTH_SERVICE_API_ROUTE: bank-app_auth-service/api
       NODE_ENV: development
     networks:
       - gateway-clients-network
       - gateway-auth-network
-    depends_on:
-      - clients-service
+    # depends_on:
+    #   - clients-service
+
+  # books-service:
+  #   image: axonedge/lab4books:latest
+  #   environment:
+  #     IO_SERVICE_API_ROUTE: lab4-cluster_io-service/api
+  #     NODE_ENV: development
+  #   networks:
+  #     - internal
+  #     - books
 
   auth-service:
     image: lauracucu/auth-microservice:1
@@ -36,15 +55,28 @@ services:
   clients-service:
     image: lauracucu/clients-microservice:1
     environment:
-      IO_SERVICE_API_ROUTE: io-service/api
-      AUTH_SERVICE_API_ROUTE: auth-service/api
+      IO_SERVICE_API_ROUTE: bank-app_io-service/api
+      AUTH_SERVICE_API_ROUTE: bank-app_auth-service/api
       NODE_ENV: development
     networks:
       - gateway-clients-network
       - auth-clients-network
       - clients-io-network
-    depends_on:
-      - io-service
+    # depends_on:
+    #   - io-service
+
+  # io-service:
+  #   image: axonedge/lab4io:latest
+  #   environment:
+  #     PGUSER: admin
+  #     PGPASSWORD: admin
+  #     PGHOST: lab4-cluster_db
+  #     PGPORT: 5432
+  #     PGDATABASE: books
+  #     NODE_ENV: development
+  #   networks:
+  #     - books
+  #     - database
 
   io-service:
     image: lauracucu/io-microservices:1
@@ -58,8 +90,21 @@ services:
     networks:
       - clients-io-network
       - io-db-network
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
+
+  # db:
+  #   image: postgres:12
+  #   environment:
+  #     POSTGRES_DB: books
+  #     POSTGRES_USER: admin
+  #     POSTGRES_PASSWORD: admin
+  #   volumes:
+  #     - ./Database/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+  #     - lab4-db:/var/lib/postgresql/data
+  #   networks:
+  #     - database
+  #     - database-admin
 
   db:
     image: postgres:12
@@ -72,8 +117,15 @@ services:
       - auth-db-network
       - db-adminer-network
     volumes:
-      - "${PWD}/Database/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql"
+      - ./Database/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
       - db-persistent-volume:/var/lib/postgresql/data
+
+  # adminer:
+  #   image: adminer
+  #   ports:
+  #     - 8080:8080
+  #   networks:
+  #     - database-admin
 
   adminer:
     image: adminer
@@ -81,8 +133,17 @@ services:
       - 8080:8080
     networks:
       - db-adminer-network
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
+
+# volumes:
+#   lab4-db:
+#
+# networks:
+#   internal:
+#   books:
+#   database:
+#   database-admin:
 
 volumes:
   db-persistent-volume:
